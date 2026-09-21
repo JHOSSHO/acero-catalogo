@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b0e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Nervio — Selector de perfiles de acero</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dark.css">
+  <script src="data/steels.js" defer></script>
+  <script src="data/connection.js" defer></script>
+  <script src="data/catalog.js" defer></script>
+  <script src="calculator.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#inicio" aria-label="Nervio, inicio"><span class="brand-mark">N</span><span>nervio<span class="brand-dot">.</span></span></a>
+    <div class="sidebar-caption">ESTRUCTURAS / GRUPO 02</div>
+    <nav aria-label="Navegación principal">
+      <a class="nav-item active" href="#inicio"><span aria-hidden="true">▦</span> Selector de perfiles <span class="nav-number">01</span></a>
+      <a class="nav-item" href="vigas.html"><span aria-hidden="true">⌁</span> Calculadora de vigas <span class="nav-number">02</span></a>
+      <a class="nav-item" href="#catalogo"><span aria-hidden="true">▤</span> Catálogo de secciones <span class="nav-number">02</span></a>
+      <a class="nav-item" href="#comparacion"><span aria-hidden="true">↗</span> Peso y reserva de S</a>
+      <a class="nav-item" href="#metodo"><span aria-hidden="true">ƒ</span> Método y fuentes</a>
+    </nav>
+    <div class="sidebar-drawing" aria-hidden="true"><svg viewBox="0 0 170 185"><path d="M45 28h80v20H68v90h57v20H45z"/><path class="dim" d="M28 28v130M20 28h16M20 158h16M45 174h80M45 169v10M125 169v10M17 93h138"/><text x="139" y="86">x</text></svg><span>MENOS ÁREA.<br>MÁS CRITERIO.</span></div>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Catálogo local · sin conexión<small>Predimensionamiento elástico</small></div>
+  </aside>
+
+  <main id="inicio">
+    <header class="topbar"><div>Proyecto académico <span>/</span> <strong>Informe grupo 2</strong></div><div class="header-actions"><button class="button quiet" id="open-share">Compartir ↗</button><button class="button quiet" id="open-report">Diagrama del informe</button></div></header>
+    <nav class="workspace-tabs" aria-label="Herramientas"><a class="active" href="index.html">Selector de perfiles</a><a href="vigas.html">Calculadora de vigas</a></nav>
+    <div id="beam-import-note" class="scope-note" hidden></div>
+    <section class="intro">
+      <div><div class="eyebrow">SELECTOR DE PERFILES DE ACERO</div><h1>De momento a <em>sección.</em></h1><p>Convierte tu momento, calcula S y encuentra el perfil que mejor se adapta.</p></div>
+      <div class="catalog-count"><strong id="total-profiles">991</strong><span>secciones reales<br>AISC + ACESCO</span></div>
+    </section>
+
+    <div class="workspace">
+      <section class="panel input-panel" aria-labelledby="input-title">
+        <div class="panel-heading"><h2 id="input-title"><span class="step">01</span> Define la demanda</h2><button type="button" class="text-button" id="reset">Restablecer</button></div>
+        <form id="calculator" novalidate>
+          <label class="field-label" for="moment">Momento flector <span>M</span></label>
+          <div class="input-unit moment-input"><input id="moment" name="moment" type="text" inputmode="decimal" value="-24,36" autocomplete="off" aria-describedby="moment-help"><span>kN·m</span></div>
+          <p class="help" id="moment-help">Se usa |M|. El signo indica el sentido de la flexión.</p>
+          <div class="preset-label">DEL DIAGRAMA DE TU NERVIO</div>
+          <div class="presets" aria-label="Momentos del informe">
+            <button type="button" class="preset selected" data-moment="-24.36"><span>Apoyo B</span><strong>−24,36</strong></button>
+            <button type="button" class="preset" data-moment="20.98"><span>Tramo A–B</span><strong>+20,98</strong></button>
+            <button type="button" class="preset" data-moment="-8.24"><span>Apoyo C</span><strong>−8,24</strong></button>
+            <button type="button" class="preset" data-moment="11.78"><span>Tramo C–D</span><strong>+11,78</strong></button>
+          </div>
+          <div class="field-divider"></div>
+          <label class="field-label" for="steel">Propiedades del acero</label>
+          <select id="steel"><option value="a572-50">ASTM A572 · grado 50</option><option value="custom">Valores personalizados</option></select>
+          <p class="help" id="steel-help"></p>
+          <div class="two-fields"><div><label for="fy">Fluencia · Fy</label><div class="input-unit"><input id="fy" type="text" inputmode="decimal" value="50"><span>ksi</span></div></div><div><label for="fu">Rotura · Fu</label><div class="input-unit"><input id="fu" type="text" inputmode="decimal" value="65"><span>ksi</span></div></div></div>
+          <p class="help">S se calcula con Fy. Fu se conserva como referencia.</p>
+          <label class="field-label tolerance-label" for="max-height">Altura máxima del nervio</label><div class="input-unit"><input id="max-height" type="text" inputmode="decimal" placeholder="Sin límite" aria-describedby="height-help"><span>cm</span></div><p class="help" id="height-help">Altura exterior total del perfil. Vacío = sin límite.</p>
+          <label class="field-label tolerance-label" for="objective">Prioridad dentro de la tolerancia</label><select id="objective"><option value="mass">Menor peso por metro</option><option value="area">Menor área transversal</option></select>
+          <label class="field-label tolerance-label" for="tolerance">Tolerancia de exceso de S</label>
+          <div class="tolerance-control"><input id="tolerance-range" aria-label="Control de tolerancia" type="range" min="0" max="100" step="1" value="20"><div class="input-unit"><input id="tolerance" type="text" inputmode="decimal" value="20" aria-describedby="tolerance-help"><span>%</span></div></div>
+          <p class="help" id="tolerance-help">Acepta S entre el requerido y un 20 % adicional.</p>
+          <div id="input-error" class="error-message" role="alert" hidden></div>
+          <button class="button primary calculate-button" type="submit">Buscar sección <span aria-hidden="true">→</span></button>
+          <div class="auto-note">Los resultados se actualizan al editar.</div>
+        </form>
+      </section>
+
+      <section class="results-column" aria-label="Resultado del predimensionamiento">
+        <div class="conversion-bar" id="conversion" aria-live="polite"></div>
+        <article class="recommendation" id="recommendation" aria-live="polite"></article>
+        <div class="scope-note"><span class="note-icon">i</span><p><strong>Un punto de partida para el diseño.</strong> M/Fy comprueba la fluencia elástica de la sección bruta. El informe usa cargas mayoradas: aún falta verificar resistencia de diseño, pandeo, cortante, flecha y conexiones.</p></div>
+      </section>
+    </div>
+
+    <section class="panel catalog-panel" id="catalogo" aria-labelledby="catalog-title">
+      <div class="catalog-heading"><div><div class="eyebrow">COMPARA TUS OPCIONES</div><h2 id="catalog-title">Un perfil para cada demanda<span>.</span></h2><p id="catalog-summary">Ordenados por menor área.</p></div><button class="button secondary" id="export-csv"><span aria-hidden="true">↓</span> Exportar CSV</button></div>
+      <div class="filters"><label class="select-filter"><span class="field-label">Familia de sección</span><select id="family-filter"><option value="all">Todas las familias</option><option value="C">C · canales C / MC / PHR</option><option value="I">I · vigas M / S</option><option value="H">H · ala ancha W / HP</option><option value="square">Tubos cuadrados</option><option value="rectangular">Tubos rectangulares</option><option value="circular">Tubos circulares HSS / PIPE</option><option value="Z">Z · conformados en frío</option></select></label><label class="select-filter"><span class="field-label">Catálogo</span><select id="catalog-filter"><option value="all">Ambos catálogos</option><option value="ACESCO">ACESCO · C / Z</option><option value="AISC">AISC · abiertos / tubos</option></select></label><label class="search-field"><span aria-hidden="true">⌕</span><span class="sr-only">Buscar referencia</span><input id="search" type="search" placeholder="Buscar referencia…"></label></div>
+      <div class="table-toolbar"><div class="table-tabs" role="group" aria-label="Perfiles visibles"><button class="active" id="matches-tab" aria-pressed="true">Dentro de tolerancia <span id="match-count">0</span></button><button id="all-tab" aria-pressed="false">Ver todo el catálogo</button></div><label class="sort-label">Ordenar <select id="sort"><option value="area">Menor área</option><option value="surplus">Menor exceso de S</option><option value="mass">Menor peso por metro</option><option value="height">Menor altura</option></select></label></div>
+      <div class="table-scroll"><table><thead><tr><th scope="col">Perfil / catálogo</th><th scope="col">Altura <small>cm</small></th><th scope="col">Área <small>in²</small></th><th scope="col">S top <small>in³</small></th><th scope="col">S bottom <small>in³</small></th><th scope="col">Peso <small>kg/m</small></th><th scope="col">Exceso de S</th><th scope="col">Evaluación</th><th scope="col"><span class="sr-only">Ver perfil</span></th></tr></thead><tbody id="profile-rows"></tbody></table></div>
+      <div id="empty-results" class="empty-results" hidden></div>
+      <div class="table-footer"><span id="pagination-info"></span><span>Todos los resultados · sin paginación</span></div>
+    </section>
+
+    <section class="panel efficiency-panel" id="comparacion" aria-labelledby="efficiency-title"><div class="catalog-heading"><div><div class="eyebrow">MÁS S POR CADA KILOGRAMO</div><h2 id="efficiency-title">Peso, reserva y altura</h2><p>Compara todos los perfiles suficientes con tus filtros y altura, incluso fuera de la tolerancia.</p></div></div><div id="efficiency-content"></div></section>
+
+    <section class="panel steels-panel" id="aceros"><div class="catalog-heading"><div><div class="eyebrow">REFERENCIAS PARA CONSTRUCCIÓN METÁLICA EN COLOMBIA</div><h2>Cinco aceros habituales</h2><p>Selección respaldada por catálogos y fuentes técnicas; no es un ranking de ventas. Fy y Fu siempre son editables.</p></div></div><div class="table-scroll"><table><thead><tr><th>Acero</th><th>Fy mín. <small>ksi</small></th><th>Fu mín. <small>ksi</small></th><th>Uso y fuentes</th><th></th></tr></thead><tbody id="steel-rows"></tbody></table></div></section>
+
+    <section class="method-section" id="metodo">
+      <div class="method-intro"><div class="eyebrow">CRITERIO TRANSPARENTE</div><h2>Las unidades correctas.<br>La decisión, a la vista.</h2><p>Se comparan las propiedades reales de cada catálogo. Puedes revisar la fuente de cualquier perfil en su ficha.</p><button class="button secondary" id="print"><span aria-hidden="true">↗</span> Imprimir memoria / PDF</button></div>
+      <div class="method-details">
+        <details open><summary>Cómo se calcula y se selecciona</summary><div><p><strong>1 kN·m = 8,8507457913 kip·in</strong>. El momento no se convierte a ksi: ksi = kip/in² es una unidad de esfuerzo.</p><p><strong>S requerido = |M| × 8,8507457913 / Fy</strong>, en in³. Se exige S top ≥ S requerido y S bottom ≥ S requerido; S gobernante = mín(S top, S bottom). La banda es S requerido ≤ S gobernante ≤ S requerido × (1 + tolerancia/100).</p><p>El mejor ajuste es el perfil de menor área dentro de esa banda y de los filtros elegidos. Si no hay coincidencias, se muestra por separado la alternativa suficiente más cercana, fuera de tolerancia. La búsqueda usa los valores completos, antes de redondear.</p></div></details>
+        <details><summary>S top, S bottom y orientación</summary><div><p>Se supone el alma vertical y flexión alrededor del eje fuerte x–x. Los perfiles C, MC, W, M, S, HP y los C de alas iguales de ACESCO son simétricos arriba y abajo: <strong>S top = S bottom = Sx = Ix/(d/2)</strong>. S top y S bottom no son Sx y Sy. Se incluyen tubos cuadrados, rectangulares y circulares. Las Z tienen simetr?a central, pero sus ejes principales est?n inclinados: se usa Sx geom?trico y se requiere analizar la flexi?n oblicua y el arriostramiento.</p><p>Los valores son geométricos de la sección bruta. En perfiles C conformados en frío, la sección efectiva y los pandeos local, distorsional y lateral pueden reducir la resistencia. Este selector no los calcula, ni considera acción compuesta con la losa.</p></div></details>
+        <details><summary>Acero grado 50 y alcance del resultado</summary><div><p>Se adoptan Fy = 50 ksi y Fu = 65 ksi, según lo solicitado. “A972” no identifica este acero estructural: ASTM A972 trata de pilotes tubulares recubiertos con epoxi. <a href="https://store.astm.org/a0572_a0572m-12.html" target="_blank" rel="noopener">ASTM A572 grado 50</a> tiene los valores indicados; A992 también tiene mínimos de 50/65 ksi.</p><p>Los C de ACESCO se fabrican con acero de lámina, y no se identifican automáticamente como A572. Verifica la especificación y el grado del producto suministrado. La <a href="https://www.acesco.com.co/descargas/fichastecnicas/ficha-tecnica-perfiles.pdf" target="_blank" rel="noopener">ficha de ACESCO</a> distingue productos y grados.</p><p>El diagrama del informe procede de 1,2D + 1,6L. Cumplir S ≥ M/Fy es una preselección, no una verificación LRFD ni ASD. Para el diseño final se necesitan, entre otros, longitud sin arriostrar, apoyos, cortantes y cargas de servicio.</p></div></details>
+        <details><summary>Documentos y trazabilidad de los datos</summary><div><ul><li><a href="informe_grupo2.pdf#page=12" target="_blank" rel="noopener">Informe grupo 2, figura 7, página PDF 12</a>. Momentos introducidos tal como están rotulados; no se recalcula el análisis del informe.</li><li><a href="data/AISC%20Shapes%20Database%20v13.2.xlsx">AISC Shapes Database v13.2</a>: 933 secciones C, MC, W, M, S, HP, HSS y PIPE del archivo local. Se utiliza el bloque imperial, columnas A, Sx e Ix.</li><li><a href="data/ACESCO%20-%20Perfiles%20C%20y%20Z%20grado%2050.pdf#page=25" target="_blank" rel="noopener">ACESCO, tabla 14, páginas impresas 48–49</a>: 35 perfiles C sencillos PHR y 23 Z de la tabla 16 (p?gina PDF 27). <a href="https://acesco.com.ec/wp-content/uploads/2019/01/perfiles-c-y-z-grado-50-manual-tecnico.pdf" target="_blank" rel="noopener">Manual de origen</a>. S en mm³ se divide por 25,4³; área en mm², por 25,4². Son tablas históricas, no un inventario de disponibilidad.</li><li>El archivo local “ACESCO - Manual Técnico.pdf” corresponde a Metaldeck grado 40 y no se utiliza como catálogo de perfiles C/I.</li></ul><p>Se conservan las áreas y los pesos tal como se publican; pueden diferir de una conversión ideal por densidad. Los radios y pandeos no se deducen de estos datos.</p></div></details>
+      </div>
+    </section>
+    <footer class="footer"><span class="footer-brand">nervio.</span><span>Grupo 02 · Diseño Estructural Avanzado</span><span>Unidades claras. Secciones verificables.</span></footer>
+    <noscript>Activa JavaScript para calcular y consultar el catálogo. La página funciona sin conexión.</noscript>
+  </main>
+
+  <dialog id="report-dialog" aria-labelledby="report-title"><div class="dialog-heading"><div><div class="eyebrow">INFORME GRUPO 02 · FIGURA 7</div><h2 id="report-title">Momentos en un nervio</h2></div><button class="close-button" id="close-report" aria-label="Cerrar diagrama">×</button></div><p>Tres tramos continuos: A–B = 8 m, B–C = 3 m y C–D = 5 m.</p><div id="report-chart"></div><p class="help">Curva reconstruida con las cargas y los momentos de apoyo redondeados del informe. Selecciona una etiqueta para usar su momento.</p><div class="report-extrema"><span>Máximo positivo <strong>+20,98 kN·m</strong></span><span>Gobierna por valor absoluto <strong>−24,36 kN·m</strong></span></div><div class="dialog-footer"><a href="informe_grupo2.pdf#page=12" target="_blank" rel="noopener" class="button secondary">Abrir PDF original ↗</a><button class="button primary" id="use-governing">Usar momento gobernante →</button></div></dialog>
+  <dialog id="share-dialog" aria-labelledby="share-title"><div class="dialog-heading"><div><div class="eyebrow">CELULAR · IPAD · OTRO COMPUTADOR</div><h2 id="share-title">Lleva el cálculo contigo.</h2></div><button class="close-button" id="close-share" aria-label="Cerrar compartir">×</button></div><p>Abre esta dirección en Safari o Chrome desde un dispositivo conectado al mismo router que este computador.</p><div id="share-status" class="share-status"></div><div id="share-links" class="share-links"></div><ol class="share-steps"><li>Mantén este computador encendido y el servidor activo.</li><li>Conecta el celular o iPad a la misma red Wi‑Fi. El computador puede estar conectado por cable al mismo router.</li><li>Abre el enlace. En Safari puedes usar Compartir → Añadir a pantalla de inicio.</li></ol><p class="help">Para volver a iniciar el servicio, usa el acceso directo COMPARTIR EN WIFI de la carpeta del proyecto. Una red de invitados puede impedir la conexión entre dispositivos. Este enlace funciona dentro de tu red, no desde datos móviles ni fuera de casa.</p><div class="dialog-footer"><button id="copy-share" class="button primary">Copiar enlace con este cálculo</button><button id="native-share" class="button secondary" hidden>Compartir desde el dispositivo</button></div><p class="help" id="share-copy-result" role="status"></p></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
