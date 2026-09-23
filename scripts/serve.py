@@ -6,7 +6,7 @@ import argparse,json,socket,os
 
 ROOT=Path(__file__).resolve().parents[1]
 FILES={'index.html','vigas.html','app.js','calculator.js','beam.js','beam-ui.js','styles.css','dark.css','beam.css',
-       'assets/favicon.svg','data/catalog.js','data/catalog.json','data/steels.js','data/connection.js'}
+       'pwa.js','pwa.css','sw.js','manifest.webmanifest','assets/icon-192.png','assets/icon-512.png','assets/apple-touch-icon.png','assets/favicon.svg','data/catalog.js','data/catalog.json','data/steels.js','data/connection.js'}
 def addresses():
     ips=set()
     for info in socket.getaddrinfo(socket.gethostname(),None,socket.AF_INET):
