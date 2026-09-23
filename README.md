@@ -10,7 +10,7 @@ Página: https://jhossho.github.io/acero-catalogo/
 
 Los documentos y las fuentes externas necesitan internet. Borrar los datos del navegador o la eliminación del almacenamiento por el dispositivo obliga a descargar otra vez la aplicación. Las actualizaciones se descargan al volver a conectarse; pulsa **Actualizar y recargar** cuando aparezca.
 
-En computador tambi?n puedes descargar el proyecto y abrir index.html directamente conservando sus carpetas. La instalación mediante service worker requiere HTTPS o localhost.
+En computador también puedes descargar el proyecto y abrir index.html directamente conservando sus carpetas. La instalación mediante service worker requiere HTTPS o localhost.
 
 ## Funciones
 
@@ -25,6 +25,6 @@ El momento se convierte de kN·m a kip·in, no a ksi. Al dividir por Fy en ksi, 
 
 Cada push a main ejecuta .github/workflows/pages.yml. GitHub Pages debe usar GitHub Actions como fuente. scripts/build_site.py prepara site-dist con una lista explícita de archivos de la aplicación; excluye informes, catálogos originales y direcciones de la red local.
 
-Al modificar archivos de la aplicación, incrementa VERSION en sw.js para que los dispositivos descarguen la actualizaci?n completa. La caché se activa cuando todos los archivos se han descargado.
+Al modificar archivos de la aplicación, incrementa VERSION en sw.js para que los dispositivos descarguen la actualización completa. La caché se activa cuando todos los archivos se han descargado.
 
-Prueba offline: ejecuta scripts/build_site.py y luego scripts/test_pwa.py con Python y Playwright instalados (la prueba usa Chrome en Windows). Comprueba recarga offline, parámetros del enlace, catálogo completo, vigas de seis apoyos y tama?o móvil.
+Prueba offline: ejecuta scripts/build_site.py y luego scripts/test_pwa.py con Python y Playwright instalados (la prueba usa Chrome en Windows). Comprueba recarga offline, parámetros del enlace, catálogo completo, vigas de seis apoyos y tamaño móvil.
