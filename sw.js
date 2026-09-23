@@ -1,5 +1,5 @@
 /* Increment the version whenever an application file changes. */
-const VERSION = 'nervio-offline-20260922-1';
+const VERSION = 'nervio-offline-20260922-2';
 const BASE = new URL('./', self.location.href);
 const CACHE = VERSION + '-' + BASE.pathname;
 const FILES = ['index.html','vigas.html','styles.css','dark.css','beam.css','pwa.css',
